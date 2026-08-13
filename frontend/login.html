@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TaskFlow — Log in</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="login.css">
+</head>
+<body>
+
+  <div class="stage">
+
+    <!-- LEFT: brand panel -->
+    <section class="brand-panel">
+      <div class="brand-glow"></div>
+
+      <div class="brand-mark">
+        <span class="dot dot-a"></span><span class="dot dot-b"></span><span class="dot dot-c"></span>
+        <span class="brand-name">TaskFlow</span>
+      </div>
+
+      <div class="brand-copy">
+        <h1>Work moves in<br>one direction here.</h1>
+        <p>Todo to doing to done — track every project without losing the thread.</p>
+      </div>
+
+      <!-- signature element: animated flow line -->
+      <div class="flow" aria-hidden="true">
+        <div class="flow-track">
+          <div class="flow-fill"></div>
+        </div>
+        <div class="flow-node" style="--i:0">
+          <span class="node-dot"></span><span class="node-label">TODO</span>
+        </div>
+        <div class="flow-node" style="--i:1">
+          <span class="node-dot"></span><span class="node-label">DOING</span>
+        </div>
+        <div class="flow-node" style="--i:2">
+          <span class="node-dot"></span><span class="node-label">DONE</span>
+        </div>
+      </div>
+    </section>
+    <!-- Google Identity SDK library -->
+    <!-- <script src="https://accounts.google.com/gsi/client" async defer></script> -->
+
+    <!-- <form id="login-form" novalidate>
+      <div class="field">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" placeholder="you@example.com">
+        <p class="field-error" id="email-error" role="alert"></p>
+      </div>
+
+      <div class="field">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" placeholder="••••••••">
+      </div>
+
+      <button type="submit" class="btn-primary" id="submit-btn">Log in</button> -->
+      
+      <!-- <div style="margin: 15px 0; text-align: center; color: #8b9bb0;">OR</div> -->
+
+      <!-- Google Sign-In Button Container -->
+      <!-- <div id="g_id_onload"
+          data-client_id="YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
+          data-callback="handleCredentialResponse">
+      </div>
+      <div class="g_id_signin" data-type="standard"></div>
+
+      <p class="form-status" id="form-status" role="status"></p>
+    </form> -->
+
+    <!-- RIGHT: form panel -->
+    <section class="form-panel">
+      <div class="form-wrap">
+
+        <header class="form-head">
+          <h2>Welcome back</h2>
+          <p>Log in to pick up where you left off.</p>
+        </header>
+
+        <form id="login-form" novalidate autocomplete="off">
+
+          <div class="field">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" placeholder="you@example.com" autocomplete="off">
+            <p class="field-error" id="email-error" role="alert"></p>
+          </div>
+
+          <div class="field">
+            <div class="field-row">
+              <label for="password">Password</label>
+              <a href="forgot-password.html" class="link-muted">Forgot password?</a>
+            </div>
+            <div class="password-wrap">
+              <input type="password" id="password" name="password" placeholder="••••••••" autocomplete="new-password">
+              <button type="button" class="toggle-visibility" id="toggle-password" aria-label="Show password">
+                <svg class="icon-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M1.5 12s3.75-7 10.5-7 10.5 7 10.5 7-3.75 7-10.5 7-10.5-7-10.5-7Z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+                <svg class="icon-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="display:none">
+                  <path d="M3 3l18 18M10.6 10.6a3 3 0 0 0 4.24 4.24M9.9 4.24A10.94 10.94 0 0 1 12 4c6.75 0 10.5 7 10.5 7a13.4 13.4 0 0 1-2.6 3.53M6.6 6.6C3.9 8.3 1.5 12 1.5 12a13.4 13.4 0 0 0 5.6 5.53"/>
+                </svg>
+              </button>
+            </div>
+            <p class="field-error" id="password-error" role="alert"></p>
+          </div>
+
+          <button type="submit" class="btn-primary" id="submit-btn">
+            <span class="btn-text">Log in</span>
+            <span class="btn-spinner" aria-hidden="true"></span>
+          </button>
+
+          <p class="form-status" id="form-status" role="status"></p>
+
+        </form>        
+
+        <p class="form-foot">
+          New to TaskFlow? <a href="signup.html" class="link-accent">Create an account</a>
+        </p>
+
+      </div>
+    </section>
+
+  </div>
+
+<!-- Sahi (Isko aise update karein): -->
+<script type="module" src="login.js"></script>
+</body>
+</html>
