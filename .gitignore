@@ -1,2 +1,6 @@
 .env
 backend/.env
+
+*.db
+*.sqlite3
+backend/taskflow.db
