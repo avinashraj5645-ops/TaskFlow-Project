@@ -1,7 +1,7 @@
 import time
 import uuid
 from typing import Optional
-from fastapi import FastAPI,APIRouter, Depends, HTTPException, status, Request
+from fastapi import FastAPI, APIRouter, Depends, HTTPException, status, Request
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
@@ -15,6 +15,10 @@ from algorithms import insertion_sort
 
 # Auth functions import karein
 from auth import get_current_user, hash_password, create_access_token, verify_password
+
+# 🟢 AI Quick-Add Parser Import (FIXED)
+from quick_add import parse_quick_add_description
+
 from dotenv import load_dotenv
 load_dotenv()  # Server start hote hi .env load karega
 
@@ -38,6 +42,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 @app.delete("/projects/{project_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_project(project_id: str, db: Session = Depends(get_db)):
     # 1. Project dhoondhein
@@ -54,7 +59,7 @@ async def delete_project(project_id: str, db: Session = Depends(get_db)):
     db.commit()
     return None
 
-# 2. Custom Logger Middleware CORS ke baad aayega
+# Custom Logger Middleware CORS ke baad aayega
 @app.middleware("http")
 async def log_requests_middleware(request: Request, call_next):
     start_time = time.time()
@@ -68,22 +73,9 @@ async def log_requests_middleware(request: Request, call_next):
 def home():
     return {"message": "SQLite DB is active!"}
 
-def parse_quick_add_description(description: str):
-    title = description
-    priority = "medium"
-    due_date = None
-
-    desc_lower = description.lower()
-    if "urgent" in desc_lower or "high" in desc_lower:
-        priority = "high"
-    elif "low" in desc_lower:
-        priority = "low"
-
-    return title, priority, due_date
-
 
 # ==========================================
-# AUTH & USER ENDPOINTS (MISSING FIXED)
+# AUTH & USER ENDPOINTS
 # ==========================================
 
 @app.post("/users", status_code=status.HTTP_201_CREATED)
@@ -104,7 +96,7 @@ def signup(data: dict, db: Session = Depends(get_db)):
         # 2. Hash password
         hashed_pwd = hash_password(password)
 
-        # 3. Dynamic Column Detection (Prevent TypeError in models.User)
+        # 3. Dynamic Column Detection
         user_kwargs = {"name": name, "email": email}
         if hasattr(models.User, "hashed_password"):
             user_kwargs["hashed_password"] = hashed_pwd
@@ -155,7 +147,7 @@ def login(credentials: dict, db: Session = Depends(get_db)):
     
     return {
         "access_token": access_token,
-        "token": access_token,  # Backward compatibility
+        "token": access_token,
         "token_type": "bearer",
         "user": {"id": user.id, "name": user.name, "email": user.email}
     }
@@ -179,7 +171,6 @@ def update_user_profile(
     if "name" in data:
         current_user.name = data["name"]
     if "email" in data:
-        # Check if email is being changed and if it already exists
         if data["email"] != current_user.email:
             existing = db.query(models.User).filter(models.User.email == data["email"]).first()
             if existing:
@@ -248,7 +239,7 @@ def get_project_stats(db: Session = Depends(get_db)):
 
 
 # ==========================================
-# TASKS ENDPOINTS
+# TASKS ENDPOINTS & AI QUICK-ADD
 # ==========================================
 
 @app.post("/tasks", response_model=schemas.TaskResponse, status_code=status.HTTP_201_CREATED)
@@ -289,7 +280,13 @@ def quick_add_task(payload: schemas.QuickAddRequest, db: Session = Depends(get_d
                 detail=f"Project with ID '{payload.project_id}' does not exist"
             )
 
+    # 🟢 Clean parsed variables using quick_add.py parser
     title, priority, due_date_hint = parse_quick_add_description(payload.description)
+
+    # Debugging Terminal Output
+    print(f"\n--- 🚀 AI QUICK-ADD TRIGGERED ---")
+    print(f"Input Text : '{payload.description}'")
+    print(f"Parsed     : Title='{title}', Priority='{priority}', Due='{due_date_hint}'\n")
 
     try:
         db_task = models.Task(
@@ -387,14 +384,12 @@ def change_password(
     db: Session = Depends(get_db), 
     current_user: models.User = Depends(get_current_user)
 ):
-    # 1. Purana password verify karein
     if not verify_password(data.current_password, current_user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, 
             detail="Incorrect current password"
         )
 
-    # 2. Naya password hash karke save karein
     current_user.hashed_password = hash_password(data.new_password)
     db.commit()
 

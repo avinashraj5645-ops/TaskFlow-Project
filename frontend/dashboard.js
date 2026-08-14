@@ -168,7 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // 3. AI Quick-Add Form Handler
+  // 3. 🟢 FIXED: AI Quick-Add Form Handler (Sends description field)
   quickAddForm?.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (quickAddError) quickAddError.textContent = '';
@@ -181,12 +181,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     try {
       await API.quickAddTask({
-        text: inputVal,
+        description: inputVal,
         project_id: quickAddProjectSelect?.value || null
       });
 
       quickAddForm.reset();
-      fetchTasks(taskSearchInput?.value, taskSortSelect?.value);
+      await fetchTasks(taskSearchInput?.value, taskSortSelect?.value);
     } catch (err) {
       console.error(err);
       if (quickAddError) quickAddError.textContent = err.message || 'Error in quick-add task.';
@@ -202,7 +202,7 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchTasks(taskSearchInput?.value.trim(), e.target.value);
   });
 
-  // Render Tasks Function (Updated: Shows Project Name Badge)
+  // Render Tasks Function
   function renderTasks(taskList) {
     if (!taskListContainer) return;
     taskListContainer.innerHTML = '';
@@ -224,17 +224,19 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
+      const displayTitle = task.title || task.name || 'Untitled task';
+
       const taskCard = document.createElement('div');
       taskCard.className = `task-item ${task.completed ? 'completed' : ''}`;
       taskCard.innerHTML = `
         <div class="task-info">
           <input type="checkbox" class="task-check" ${task.completed ? 'checked' : ''}>
           <div class="task-details">
-            <span class="task-title-text">${escapeHTML(task.title || '')}</span>
+            <span class="task-title-text">${escapeHTML(displayTitle)}</span>
             <div class="task-meta">
               ${projectName ? `<span class="project-tag" style="background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 4px; font-size: 0.8rem; margin-right: 6px;">📁 ${escapeHTML(projectName)}</span>` : ''}
               ${task.due_date ? `<span class="due-tag">📅 ${escapeHTML(task.due_date)}</span>` : ''}
-              <span class="priority-tag priority-${task.priority}">${task.priority || 'low'}</span>
+              <span class="priority-tag priority-${task.priority || 'low'}">${task.priority || 'low'}</span>
             </div>
           </div>
         </div>

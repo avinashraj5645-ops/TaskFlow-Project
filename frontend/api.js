@@ -148,9 +148,10 @@ export const API = {
     return await res.json();
   },
 
+  // 🟢 FIXED: Quick Add Method
   async quickAddTask(quickData) {
     const payload = {
-      description: String(quickData.text || quickData.description).trim(),
+      description: String(quickData.text || quickData.description || "").trim(),
       project_id: quickData.project_id && String(quickData.project_id).trim() !== "" ? String(quickData.project_id) : null
     };
 
@@ -161,10 +162,9 @@ export const API = {
     });
 
     if (!res.ok) {
-      return await this.createTask({
-        title: payload.description,
-        project_id: payload.project_id
-      });
+      const errData = await res.json().catch(() => ({}));
+      console.error("Quick-Add Backend Error:", errData);
+      throw new Error(errData.detail || `Quick-add failed with status ${res.status}`);
     }
 
     return await res.json();

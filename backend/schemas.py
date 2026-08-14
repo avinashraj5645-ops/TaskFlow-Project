@@ -35,7 +35,6 @@ class TaskCreate(BaseModel):
     title: str
     due_date: Optional[str] = None
     priority: str = Field(default="medium", pattern="^(low|medium|high)$")
-    # FIX: project_id ko Optional[str] kiya hai taaki UUID String easily accept ho sake
     project_id: Optional[str] = None 
 
     @field_validator("title")
@@ -45,6 +44,15 @@ class TaskCreate(BaseModel):
         if not trimmed:
             raise ValueError("Task title cannot be empty or blank whitespace.")
         return trimmed
+
+    # 🟢 FIX: Empty string project_id ("") ko None mein convert karne ke liye validator
+    @field_validator("project_id")
+    @classmethod
+    def validate_project_id(cls, v: Optional[str]) -> Optional[str]:
+        if v is not None and not v.strip():
+            return None
+        return v
+
 
 class TaskUpdate(BaseModel):
     title: Optional[str] = None
@@ -61,6 +69,14 @@ class TaskUpdate(BaseModel):
                 raise ValueError("Task title cannot be empty or blank whitespace.")
             return trimmed
         return v
+
+    @field_validator("project_id", check_fields=False)
+    @classmethod
+    def validate_project_id(cls, v: Optional[str]) -> Optional[str]:
+        if v is not None and not v.strip():
+            return None
+        return v
+
 
 class TaskResponse(BaseModel):
     id: str
@@ -82,6 +98,24 @@ class ProjectStatsResponse(BaseModel):
     completed_tasks: int
     pending_tasks: int
 
+
+# --- AI Quick-Add Request Schema ---
 class QuickAddRequest(BaseModel):
     description: str
     project_id: Optional[str] = None
+
+    @field_validator("description")
+    @classmethod
+    def validate_description(cls, v: str) -> str:
+        trimmed = v.strip()
+        if not trimmed:
+            raise ValueError("Quick-add description cannot be empty or blank whitespace.")
+        return trimmed
+
+    # 🟢 FIX: Handle empty string "" project_id gracefully from JS select box
+    @field_validator("project_id")
+    @classmethod
+    def validate_project_id(cls, v: Optional[str]) -> Optional[str]:
+        if v is not None and not v.strip():
+            return None
+        return v
