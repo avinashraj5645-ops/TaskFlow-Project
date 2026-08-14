@@ -1,28 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TaskFlow — Dashboard</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="dashboard.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TaskFlow — Dashboard</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="dashboard.css">
 </head>
 <body>
 
-  <!-- ============ HEADER (Task 10: sticky/fixed persistent element) ============ -->
+  <!-- ============ HEADER ============ -->
   <header class="app-header">
     <div class="brand-mark">
       <span class="dot dot-a"></span><span class="dot dot-b"></span><span class="dot dot-c"></span>
       <span class="brand-name">TaskFlow</span>
     </div>
 
-    <!-- profile entry point -->
-    <!-- <a href="profile.html" class="profile-link" aria-label="Go to profile">
-      <span class="profile-avatar">A</span>
-    </a> -->
-    <!-- connect profile -->
-     <!-- Profile Button (Pehle se aapke code mein hai) -->
+    <!-- Profile Button -->
     <a href="profile.html" class="profile-link" aria-label="Go to profile">
       <span class="profile-avatar">A</span>
     </a>
@@ -30,15 +27,12 @@
 
   <main class="dashboard">
 
-    <!-- ============ Task 9: heading ============ -->
     <h1 class="page-title">Your projects</h1>
 
-    <!-- ============ Project create form ============
-         TODO (you write this): wire submit -> POST /projects on your backend.
-         Needs: name input, owner_id (or derive from logged-in user), submit button. -->
+    <!-- ============ Project create & list form ============ -->
     <section class="panel" aria-labelledby="new-project-heading">
-      <h2 id="new-project-heading">New project</h2>
-      <form id="project-form" novalidate>
+      <h2 id="new-project-heading">Projects</h2>
+      <form id="project-form" novalidate style="margin-bottom: 20px;">
         <div class="field">
           <label for="project-name">Project name</label>
           <input type="text" id="project-name" name="project-name" placeholder="e.g. Dark-store restock">
@@ -46,9 +40,12 @@
         </div>
         <button type="submit" class="btn-primary">Create project</button>
       </form>
+
+      <!-- Projects Container -->
+      <div id="project-list" class="task-list" aria-live="polite"></div>
     </section>
 
-    <!-- ============ Task 9: add-task form (title input, due-date/priority, submit) ============ -->
+    <!-- ============ Add-task form ============ -->
     <section class="panel" aria-labelledby="new-task-heading">
       <h2 id="new-task-heading">Add a task</h2>
       <form id="task-form" novalidate>
@@ -56,7 +53,6 @@
         <div class="field">
           <label for="task-title">Title</label>
           <input type="text" id="task-title" name="task-title" placeholder="What needs doing?">
-          <!-- TODO (Task 13): populate this on empty-title submit, clear it once valid -->
           <p class="field-error" id="task-title-error" role="alert"></p>
         </div>
 
@@ -68,7 +64,6 @@
 
           <div class="field">
             <label for="task-priority">Priority</label>
-            <!-- matches the closed set from the backend: low / medium / high -->
             <select id="task-priority" name="task-priority">
               <option value="low">Low</option>
               <option value="medium" selected>Medium</option>
@@ -79,7 +74,6 @@
 
         <div class="field">
           <label for="task-project">Project</label>
-          <!-- TODO (you write this): populate <option>s from GET /projects -->
           <select id="task-project" name="task-project"></select>
         </div>
 
@@ -87,7 +81,7 @@
       </form>
     </section>
 
-    <!-- ============ AI quick-add form (Section 3: POST /tasks/quick-add) ============ -->
+    <!-- ============ AI quick-add form ============ -->
     <section class="panel panel-accent" aria-labelledby="quick-add-heading">
       <h2 id="quick-add-heading">Quick-add with AI</h2>
       <p class="panel-hint">Describe the task in one sentence — priority and due date are parsed automatically.</p>
@@ -106,11 +100,10 @@
       </form>
     </section>
 
-    <!-- ============ Task 9: container that holds the rendered task list ============ -->
+    <!-- ============ Rendered task list ============ -->
     <section class="panel" aria-labelledby="task-list-heading">
       <div class="task-list-head">
         <h2 id="task-list-heading">Tasks</h2>
-        <!-- TODO (Section 2): wire these to GET /tasks?sort=priority and /tasks/search -->
         <div class="task-list-controls">
           <input type="search" id="task-search" placeholder="Search by exact title…">
           <select id="task-sort">
@@ -120,17 +113,13 @@
         </div>
       </div>
 
-      <!-- Task 9/11: this is the container your JS renders into with
-           createElement()/appendChild() — leave it empty here. -->
       <div id="task-list" class="task-list" aria-live="polite"></div>
 
-      <!-- shown by JS when task-list has zero children -->
       <p class="empty-state" id="empty-state" hidden>No tasks yet — add one above.</p>
     </section>
 
   </main>
 
-<!-- <script src="script.js"></script> -->
 <script type="module" src="./dashboard.js"></script>
 </body>
 </html>

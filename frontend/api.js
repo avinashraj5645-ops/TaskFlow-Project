@@ -62,7 +62,7 @@ export const API = {
     }
 
     return data;
-  }, // <-- Comma add kar diya hai
+  },
 
   // Projects
   async getProjects() {
@@ -91,6 +91,15 @@ export const API = {
 
     if (!res.ok) throw new Error("Failed to create project");
     return await res.json();
+  },
+
+  async deleteProject(id) {
+    const res = await fetch(`${BASE_URL}/projects/${id}`, {
+      method: "DELETE",
+      headers: getHeaders()
+    });
+    if (!res.ok) throw new Error("Failed to delete project");
+    return true;
   },
 
   async getProjectStats() {

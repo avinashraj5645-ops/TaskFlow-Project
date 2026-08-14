@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const projectForm = document.getElementById('project-form');
   const projectNameInput = document.getElementById('project-name');
   const projectNameError = document.getElementById('project-name-error');
+  const projectListContainer = document.getElementById('project-list');
 
   const taskForm = document.getElementById('task-form');
   const taskTitleInput = document.getElementById('task-title');
@@ -39,6 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       projects = await API.getProjects();
       populateProjectDropdowns(projects);
+      renderProjects(projects);
     } catch (err) {
       console.error('Projects load error:', err);
     }
@@ -53,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Populate ALL Project Dropdowns (Fixed Default Option Handling)
+  // Populate ALL Project Dropdowns
   function populateProjectDropdowns(projectList) {
     const dropdowns = [taskProjectSelect, quickAddProjectSelect];
 
@@ -72,6 +74,46 @@ document.addEventListener('DOMContentLoaded', () => {
         const pName = proj.name || proj.title || `Project #${proj.id}`;
         select.add(new Option(pName, proj.id));
       });
+    });
+  }
+
+  // Render Projects List with Delete Action
+  function renderProjects(projectList) {
+    if (!projectListContainer) return;
+    projectListContainer.innerHTML = '';
+
+    if (!projectList || projectList.length === 0) {
+      projectListContainer.innerHTML = '<p class="panel-hint">No projects found. Create one above!</p>';
+      return;
+    }
+
+    projectList.forEach(proj => {
+      const projItem = document.createElement('div');
+      projItem.className = 'task-item';
+      projItem.style.marginBottom = '8px';
+
+      const pName = proj.name || proj.title || `Project #${proj.id}`;
+
+      projItem.innerHTML = `
+        <div class="task-info">
+          <span style="font-weight: 500;">📁 ${escapeHTML(pName)}</span>
+        </div>
+        <button class="btn-delete" title="Delete project">&times;</button>
+      `;
+
+      projItem.querySelector('.btn-delete').addEventListener('click', async () => {
+        if (confirm(`Delete project "${pName}"?`)) {
+          try {
+            await API.deleteProject(proj.id);
+            await fetchProjects();
+            await fetchTasks(taskSearchInput?.value, taskSortSelect?.value);
+          } catch (err) {
+            alert(err.message || 'Failed to delete project');
+          }
+        }
+      });
+
+      projectListContainer.appendChild(projItem);
     });
   }
 
@@ -160,7 +202,7 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchTasks(taskSearchInput?.value.trim(), e.target.value);
   });
 
-  // Render Tasks Function
+  // Render Tasks Function (Updated: Shows Project Name Badge)
   function renderTasks(taskList) {
     if (!taskListContainer) return;
     taskListContainer.innerHTML = '';
@@ -173,6 +215,15 @@ document.addEventListener('DOMContentLoaded', () => {
     if (emptyState) emptyState.hidden = true;
 
     taskList.forEach(task => {
+      // Find matching project name using task.project_id
+      let projectName = '';
+      if (task.project_id) {
+        const foundProj = projects.find(p => String(p.id) === String(task.project_id));
+        if (foundProj) {
+          projectName = foundProj.name || foundProj.title || `Project #${foundProj.id}`;
+        }
+      }
+
       const taskCard = document.createElement('div');
       taskCard.className = `task-item ${task.completed ? 'completed' : ''}`;
       taskCard.innerHTML = `
@@ -181,12 +232,13 @@ document.addEventListener('DOMContentLoaded', () => {
           <div class="task-details">
             <span class="task-title-text">${escapeHTML(task.title || '')}</span>
             <div class="task-meta">
+              ${projectName ? `<span class="project-tag" style="background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 4px; font-size: 0.8rem; margin-right: 6px;">📁 ${escapeHTML(projectName)}</span>` : ''}
               ${task.due_date ? `<span class="due-tag">📅 ${escapeHTML(task.due_date)}</span>` : ''}
               <span class="priority-tag priority-${task.priority}">${task.priority || 'low'}</span>
             </div>
           </div>
         </div>
-        <button class="btn-delete">&times;</button>
+        <button class="btn-delete" title="Delete task">&times;</button>
       `;
 
       taskCard.querySelector('.task-check').addEventListener('change', async (e) => {
