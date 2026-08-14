@@ -1,13 +1,14 @@
 import time
 import uuid
 from typing import Optional
-from fastapi import FastAPI, Depends, HTTPException, status, Request
+from fastapi import FastAPI,APIRouter, Depends, HTTPException, status, Request
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 
 from database import engine, Base
 import models
+from models import Project
 import schemas
 from dependencies import get_db
 from algorithms import insertion_sort
@@ -37,6 +38,21 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+@app.delete("/projects/{project_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_project(project_id: str, db: Session = Depends(get_db)):
+    # 1. Project dhoondhein
+    project = db.query(Project).filter(Project.id == project_id).first()
+    
+    if not project:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail="Project not found"
+        )
+    
+    # 2. Project delete karein
+    db.delete(project)
+    db.commit()
+    return None
 
 # 2. Custom Logger Middleware CORS ke baad aayega
 @app.middleware("http")
